@@ -48,28 +48,42 @@ const App: React.FC<Props> = () => {
     setInputs(newInputs)
   }
 
+  const _isValidationError = () => {
+    return inputs.some(input => input.error)
+  }
+
+  const _isInputsEmpty = () => {
+    return inputs.some(input => !input.value)
+  }
+
   const calculate = (): void => {
-    if (!inputs[0].value) {
-      return
+    if (!_isValidationError() && !_isInputsEmpty()) {
+      // calculate duration in decimal
+      let totalHours = 0.0
+      for (let i = 0; i < inputs.length; i++) {
+        const element = inputs[i].value
+        const splits = element.split(':')
+
+        const hours = parseFloat(splits[0])
+        const minsToHours = parseFloat(splits[1]) / 60
+        const secsToHours = (parseFloat(splits[2]) / 3600) || 0
+
+        totalHours += hours + minsToHours + secsToHours
+      }
+
+      // calculate duration in 00:00 format based on totalHours
+      const decimalSplits = `${totalHours}`.split('.')
+      const hours = parseInt(decimalSplits[0])
+      const mins = (totalHours - hours) * 60
+
+      const minSplits = `${mins}`.split('.')
+      const hourStr = decimalSplits[0].length < 2 ? `0${decimalSplits[0]}` : decimalSplits[0]
+      const minStr = minSplits[0].length < 2 ? `0${minSplits[0]}` : minSplits[0]
+
+      const duration = `${hourStr}:${minStr}`
+
+      setResult({ decimal: totalHours, duration })
     }
-
-    // calculate duration in decimal
-    let totalHours = 0.0
-    for (let i = 0; i < inputs.length; i++) {
-      const element = inputs[i].value
-      const splits = element.split(':')
-      const hours = parseFloat(splits[0])
-      const minsToHours = parseFloat(splits[1]) / 60
-      const secsToHours = (parseFloat(splits[2]) / 3600) || 0
-      totalHours += hours + minsToHours + secsToHours
-    }
-
-    // calculate duration in 00:00 format based on totalHours
-    const decimalSplits = `${totalHours}`.split('.')
-    const hours = parseInt(decimalSplits[0])
-    const duration = `${decimalSplits[0]}:${(totalHours - hours) * 60}`
-
-    setResult({ decimal: totalHours, duration })
   }
 
   const clear = (): void => {
