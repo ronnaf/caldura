@@ -52,12 +52,12 @@ const App: React.FC<Props> = () => {
     return inputs.some(input => input.error)
   }
 
-  const _isInputsEmpty = () => {
+  const _areInputsEmpty = () => {
     return inputs.some(input => !input.value)
   }
 
   const calculate = (): void => {
-    if (!_isValidationError() && !_isInputsEmpty()) {
+    if (!_isValidationError() && !_areInputsEmpty()) {
       // calculate duration in decimal
       let totalHours = 0.0
       for (let i = 0; i < inputs.length; i++) {
